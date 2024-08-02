@@ -211,9 +211,38 @@ pub struct Matrix<T, R, C, S> {
     _phantoms: PhantomData<(T, R, C)>,
 }
 
-impl<T, R: Dim, C: Dim, S: fmt::Debug> fmt::Debug for Matrix<T, R, C, S> {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        self.data.fmt(formatter)
+impl<T: fmt::Debug, R: Dim, C: Dim, S: RawStorage<T, R, C> + fmt::Debug> fmt::Debug
+for Matrix<T, R, C, S>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        let (start, end) = match f.alternate() {
+            true => {
+                writeln!(f, "")?;
+                ("[", "],\n ")
+            },
+            false => {
+                write!(f, "[")?;
+                ("[", "], ")
+            },
+        };
+
+        for (i, row) in self.row_iter().enumerate() {
+            if i > 0 {
+                write!(f, "{end}")?;
+            }
+            write!(f, "{start}")?;
+            for (j, element) in row.iter().enumerate() {
+                if j > 0 {
+                    write!(f, ", ")?;
+                }
+                element.fmt(f)?;
+            }
+        }
+
+        match f.alternate() {
+            true => writeln!(f, ""),
+            false => write!(f, "]"),
+        }
     }
 }
 
