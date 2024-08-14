@@ -215,17 +215,9 @@ impl<T: fmt::Debug, R: Dim, C: Dim, S: RawStorage<T, R, C> + fmt::Debug> fmt::De
 for Matrix<T, R, C, S>
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        let (start, end) = match f.alternate() {
-            true => {
-                writeln!(f, "")?;
-                ("[", "],\n ")
-            },
-            false => {
-                write!(f, "[")?;
-                ("[", "], ")
-            },
-        };
+        write!(f, "[\n")?;
 
+        let (start, end) = ("    [", "],\n");
         for (i, row) in self.row_iter().enumerate() {
             if i > 0 {
                 write!(f, "{end}")?;
@@ -239,10 +231,7 @@ for Matrix<T, R, C, S>
             }
         }
 
-        match f.alternate() {
-            true => writeln!(f, ""),
-            false => write!(f, "]"),
-        }
+        write!(f, "]\n]")
     }
 }
 
